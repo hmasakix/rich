@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>asahigiku-challenge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1 class="h1">旭菊チャレンジ！</h1>
+  <h2 class="h2">STARTボタンを押して純米酒六号のラベルを揃えよう</h2>
+
+  <div class="game-container">
+   <!-- コメントです -->
+  <div class="slot-machine">
+    <div class="slot" id="slot1"></div>
+    <div class="slot" id="slot2"></div>
+    <div class="slot" id="slot3"></div>
+  </div>
+  <button id="spin-button">START！</button>
+  <p id="result"></p>
+
+<script>
+
+const slot1 = document.getElementById('slot1');
+const slot2 = document.getElementById('slot2');
+const slot3 = document.getElementById('slot3');
+const result = document.getElementById('result');
+const spinButton = document.getElementById('spin-button');
+
+const images = [
+  './roku1.jpg', // 1つ目の画像
+  './roku2.jpg', // 2つ目の画像
+  './roku3.jpg'  // 3つ目の画像
+];
+   // スロットが回転中にランダムな画像を選択、表示する
+function getRandomImage() {
+  return images[Math.floor(Math.random() * images.length)];
+}
+   // スロットが回転しているような効果
+function startSpinning(slot, intervalTime) {
+  return setInterval(() => {
+    slot.style.backgroundImage = `url(${getRandomImage()})`;
+    slot.style.backgroundSize = 'cover'; // 画像の表示サイズをカバーに設定
+    slot.style.backgroundPosition = 'center'; // 画像を中央に配置
+  }, intervalTime);
+}
+
+function stopSpinning(spinIntervals) {
+   // 各スロットの回転を順に停止
+  setTimeout(() => clearInterval(spinIntervals[0]), 1000);
+  setTimeout(() => clearInterval(spinIntervals[1]), 1200);
+  setTimeout(() => clearInterval(spinIntervals[2]), 1400);
+  setTimeout(() => {
+
+   // スロット停止後に画像を設定
+    const finalImage1 = getRandomImage();
+    const finalImage2 = getRandomImage();
+    const finalImage3 = getRandomImage();
+
+    slot1.style.backgroundImage = `url(${finalImage1})`;
+    slot2.style.backgroundImage = `url(${finalImage2})`;
+    slot3.style.backgroundImage = `url(${finalImage3})`;
+
+   // 大当たり判定
+   if (
+      finalImage1.includes('roku1.jpg') &&
+      finalImage2.includes('roku2.jpg') &&
+      finalImage3.includes('roku3.jpg')
+    ) {
+      result.textContent = '大当たり！純米酒六号';
+      result.style.color = 'red';
+   // 大当たりの場合に画像を表示
+  const image = document.createElement('img');
+  image.src = 'atari.jpg';// 表示したい画像のパス
+  image.alt = '大当たりの画像';
+  image.style.width = '200px'; // サイズを調整
+  image.style.height = 'auto';
+
+   // 既存の画像があれば削除し、画像を追加
+  if (result.nextSibling) {
+        result.nextSibling.remove();
+      }
+      result.insertAdjacentElement('afterend', image);
+    } else {
+      result.textContent = 'ハズレ';
+      result.style.color = 'black';
+   // ハズレのときに表示されている画像を削除
+      if (result.nextSibling && result.nextSibling.tagName === 'IMG') {
+        result.nextSibling.remove();
+      }
+    }
+   // ボタンの再有効化
+    spinButton.disabled = false;
+  }, 1500);
+}
+
+function spin() {
+  result.textContent = ''; // リセット
+  spinButton.disabled = true;
+
+  const spinIntervals = [
+    startSpinning(slot1, 100),
+    startSpinning(slot2, 120),
+    startSpinning(slot3, 140)
+  ];
+
+  stopSpinning(spinIntervals);
+}
+
+spinButton.addEventListener('click', spin);
+
+</script>
+</body>
+</html>
+
